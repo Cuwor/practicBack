@@ -1,0 +1,19 @@
+{
+  "name": "practicback",
+  "version": "1.0.0",
+  "description": "practicBlog",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cuwor/practicBack.git"
+  },
+  "author": "Tolstikov Artem <temichit@yandex.ru>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cuwor/practicBack/issues"
+  },
+  "homepage": "https://github.com/Cuwor/practicBack#readme"
+}
