@@ -3,51 +3,55 @@ var app = express();
 
 app.set('view engine', 'ejs')
 app.get('/', function(res, res) {
-  res.send('Hello, SibDev');
+  res.render('index');
 })
 app.listen(3000, function() {
   console.log('Example 3000 port');
 })
 
 app.get('/register', function (req, res) {
-  res.send('register');
+  res.render('register');
 });
 
 app.post('/register', function (req, res) {
-  res.send('register');
+  res.render('register');
 });
 
 app.post('/auth', function (req, res) {
-  res.send('authentific');
+  res.render('auth');
 });
 app.get('/auth', function (req, res) {
-  res.send('authentific');
+  res.render('auth');
 });
 
 app.get('/page/:page', function (req, res) {
-  res.send('All articles');
+  res.render('index');
 });
 
 app.get('/post/:id', function (req, res) {
-  res.send('post');
+  res.render('post');
+});
+
+app.post('/post/:id', function (req, res) {
+  res.render('post');
 });
 
 app.get('/post/new', function (req, res) {
-  res.send('new article');
+  res.render('new');
 });
 
 app.get('/post/:id/edit', function (req, res) {
-  res.send('edit article');
+  res.render('edit');
 });
 
 app.put('/post/:id', function (req, res) {
-  res.send('post');
+  res.render('post');
 });
 
 app.post('/post/new', function (req, res) {
-  res.send('new article');
+  res.render('new');
 });
 
 app.get('/author/:id', function (req, res) {
-  res.send(' author');
+  res.render('author');
 });
