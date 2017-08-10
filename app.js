@@ -13,15 +13,22 @@ app.get('/register', function (req, res) {
   res.send('register');
 });
 
+app.post('/register', function (req, res) {
+  res.send('register');
+});
+
 app.post('/auth', function (req, res) {
   res.send('authentific');
 });
+app.get('/auth', function (req, res) {
+  res.send('authentific');
+});
 
-app.get('/page', function (req, res) {
+app.get('/page/:page', function (req, res) {
   res.send('All articles');
 });
 
-app.get('/post', function (req, res) {
+app.get('/post/:id', function (req, res) {
   res.send('post');
 });
 
@@ -29,14 +36,18 @@ app.get('/post/new', function (req, res) {
   res.send('new article');
 });
 
-app.get('/post/edit', function (req, res) {
+app.get('/post/:id/edit', function (req, res) {
   res.send('edit article');
 });
 
-app.put('/post', function (req, res) {
+app.put('/post/:id', function (req, res) {
   res.send('post');
 });
 
-app.get('/author', function (req, res) {
+app.post('/post/new', function (req, res) {
+  res.send('new article');
+});
+
+app.get('/author/:id', function (req, res) {
   res.send(' author');
 });
