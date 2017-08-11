@@ -1,20 +1,20 @@
 <% include layout/_header %>
-<div class="container">
-  <div class="row">
+  <div class="container">
+    <div class="row">
 
-    <div class="col-sm-12">
-      <h1>Карточка автора Семён</h1>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="post/post/:1">пост 1</a></li>
-        <li><a href="post/post/:1">пост 2</a></li>
-        <li><a href="post/post/:1">пост 3</a></li>
-        <li><a href="post/post/:1">пост 4</a></li>
-        <li><a href="post/post/:1">пост 5</a></li>
-        <li><a href="post/post/:1">пост 6</a></li>
-        <li><a href="post/post/:1">пост 7</a></li>
-      </ul>
+      <div class="col-sm-12">
+        <h1> <%= author %></h1>
+        <ul class="nav nav-pills nav-stacked">
+          <% posts.forEach(function(posts){ %>
+            <li>
+              <a href="/post/<%= posts.id %>">
+                <%= posts.postName %>
+              </a>
+            </li>
+            <% }); %>
+        </ul>
 
+      </div>
     </div>
   </div>
-</div>
-<% include layout/_footer %>
+  <% include layout/_footer %>

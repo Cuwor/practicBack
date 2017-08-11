@@ -2,9 +2,9 @@
 <div class="container">
     <div class="row">
       <div class=" col-md-12">
-        <h1>Статья же</h1>
-        <span class="date">5.05.2017&nbsp;&nbsp;&nbsp;</span>
-        <span class="author"><a href="/author/:1">Семен</a></span>
+        <h1><%= title %></h1>
+        <span class="date"><%= date %>&nbsp;&nbsp;&nbsp;</span>
+        <span class="author"><a href="/author/id"><%= author %></a></span>
         <hr>
         <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus quas reprehenderit, maxime sunt cumque in fugit quos, autem labore asperiores dolorum ex provident sapiente facere quod. Sequi sunt voluptatum non!</div>
         <div>Commodi quos mollitia et nesciunt expedita sunt reprehenderit facilis, minus accusantium optio iste, nisi sit iure voluptates incidunt soluta eveniet, a ipsam? Minus minima enim, eos quasi aperiam, architecto sapiente?</div>
@@ -22,7 +22,7 @@
     <br>
     <div class="row">
       <div class="notRegged col-md-12">
-        <a href="post/edit" class="btn btn-warning">Редактировать</a>
+        <a href="/post/id/edit" class="btn btn-warning">Редактировать</a>
         <button class="btn btn-danger">Удалить</button>
       </div>
     </div>
