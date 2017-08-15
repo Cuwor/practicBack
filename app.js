@@ -26,7 +26,7 @@ app.get('/', async function(res, res) {
   })
 })
 
-app.get('/page/:page', function(req, res) {
+app.get('/page/:page', async function(req, res) {
   var timestamp = 1502774726404
   var date = new Date(timestamp)
   var beautiful_date = date.getDate()+'.'+date.getMonth()+'.'+date.getFullYear()
@@ -50,11 +50,11 @@ app.get('/page/:page', function(req, res) {
   })
 })
 
-app.listen(3000, function() {
+app.listen(3000, async function() {
   console.log('Example 3000 port')
 })
 
-app.get('/register', function(req, res) {
+app.get('/register', async function(req, res) {
   res.render('register', {
     title: 'Регистрация',
     error: 'Проверьте правильность заполнения',
@@ -62,7 +62,7 @@ app.get('/register', function(req, res) {
   })
 })
 
-app.post('/register', function(req, res) {
+app.post('/register', async function(req, res) {
   res.render('register', {
     title: 'Регистрация',
     error: 'Проверьте правильность заполнения',
@@ -70,14 +70,14 @@ app.post('/register', function(req, res) {
   })
 })
 
-app.post('/auth', function(req, res) {
+app.post('/auth', async function(req, res) {
   res.render('auth', {
     title: 'Авторизация',
     error: 'Неверный логин или пароль',
     visibleError: false
   })
 })
-app.get('/auth', function(req, res) {
+app.get('/auth', async function(req, res) {
   res.render('auth', {
     title: 'Авторизация',
     error: 'Неверный логин или пароль',
@@ -86,7 +86,7 @@ app.get('/auth', function(req, res) {
 })
 
 
-app.get('/post/:id', function(req, res) {
+app.get('/post/:id', async function(req, res) {
   res.render('post', {
     title: 'Статья',
     author: 'Семен',
@@ -95,7 +95,7 @@ app.get('/post/:id', function(req, res) {
   })
 })
 
-app.post('/post/:id', function(req, res) {
+app.post('/post/:id', async function(req, res) {
   res.render('post', {
     title: 'Статья',
     author: 'Семен',
@@ -104,7 +104,7 @@ app.post('/post/:id', function(req, res) {
   })
 })
 
-app.get('/post/new', function(req, res) {
+app.get('/post/new', async function(req, res) {
   res.render('new', {
     title: 'Новая статья',
     error: 'Проверьте правильность заполнения',
@@ -112,7 +112,7 @@ app.get('/post/new', function(req, res) {
   })
 })
 
-app.get('/post/:id/edit', function(req, res) {
+app.get('/post/:id/edit', async function(req, res) {
   res.render('edit', {
     title: 'Редактировать статью',
     error: 'Проверьте правильность заполнения',
@@ -120,7 +120,7 @@ app.get('/post/:id/edit', function(req, res) {
   })
 })
 
-app.put('/post/:id', function(req, res) {
+app.put('/post/:id', async function(req, res) {
   res.render('post', {
     title: 'Статья',
     author: 'Семен',
@@ -129,7 +129,7 @@ app.put('/post/:id', function(req, res) {
   })
 })
 
-app.post('/post/new', function(req, res) {
+app.post('/post/new', async function(req, res) {
   res.render('new', {
     title: 'Новая статья',
     error: 'Проверьте правильность заполнения',
@@ -137,7 +137,7 @@ app.post('/post/new', function(req, res) {
   })
 })
 
-app.get('/author/:id', function(req, res) {
+app.get('/author/:id', async function(req, res) {
   res.render('author', {
     title: 'Карточка автора',
     author: 'Семен',
