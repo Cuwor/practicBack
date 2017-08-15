@@ -22,5 +22,8 @@
     "express": "^4.15.4",
     "express-generator": "^4.15.0",
     "node-static": "^0.7.9"
+  },
+  "devDependencies": {
+    "eslint": "^4.4.1"
   }
 }
