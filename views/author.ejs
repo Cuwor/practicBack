@@ -5,13 +5,13 @@
       <div class="col-sm-12">
         <h1><%= title %> <%= author %></h1>
         <ul class="nav nav-pills nav-stacked">
-          <% posts.forEach(function(posts){ %>
+          <% for(let post of posts){ %>
             <li>
               <a href="/post/<%= posts.id %>">
-                <%= posts.postName %>
+                <%= post.postName %>
               </a>
             </li>
-            <% }); %>
+            <% } %>
         </ul>
 
       </div>

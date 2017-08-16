@@ -1,20 +1,20 @@
 <% include layout/_header %>
 <div class="container">
-  <% posts.forEach(function(posts){ %>
+  <% for(let post of posts){ %>
     <div class="row">
       <div class="col-sm-12">
-      <h1><%= posts.postName %></h1>
-      <span class="date"><%= posts.date %>&nbsp;&nbsp;&nbsp;</span>
-      <span class="author"><a href="/author/id"><%= posts.author %></a></span>
+      <h1><%= post.postName %></h1>
+      <span class="date"><%= post.date %>&nbsp;&nbsp;&nbsp;</span>
+      <span class="author"><a href="/author/id"><%= post.author %></a></span>
       <hr>
       <div>
-        <%= posts.postText %>
+        <%= post.postText %>
       </div>
       <br><a href="/post/<%= posts.id %>" class="btn btn-info" role="button">Читать в источнике</a><hr>
     </div>
   </div>
 
-    <% }); %>
+    <% } %>
 
     <div class="row">
       <div class="col-sm-12">
