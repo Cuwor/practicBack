@@ -1,5 +1,9 @@
 var express = require('express')
+var passport = require('./auth')
 var app = express()
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.set('view engine', 'ejs')
 app.get('/', async function(res, res) {
@@ -46,10 +50,6 @@ app.get('/page/:page', async function(req, res) {
       }
     ]
   })
-})
-
-app.listen(3000, async function() {
-  console.log('Example 3000 port')
 })
 
 app.get('/register', async function(req, res) {
@@ -149,4 +149,8 @@ app.get('/author/:id', function(req, res) {
       }
     ]
   })
+})
+
+app.listen(3000, function() {
+  console.log('Example 3000 port')
 })
