@@ -1,6 +1,8 @@
 var express = require('express')
 var passport = require('./auth')
+var models = require('./models')
 var app = express()
+
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -151,6 +153,8 @@ app.get('/author/:id', function(req, res) {
   })
 })
 
-app.listen(3000, function() {
-  console.log('Example 3000 port')
-})
+models.sequelize.authenticate().then(function () {
+        console.log("CONNECTED! ")
+    }).catch(function (err) {
+        console.log("No No No")
+    }).done()
