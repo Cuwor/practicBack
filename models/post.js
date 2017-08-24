@@ -17,9 +17,7 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         // associations can be defined here
-        Post.belongsTo(models.User, {
-          foreignKey: { allowNull:false }
-        })
+        Post.belongsTo(models.User)
       }
     }
   })
