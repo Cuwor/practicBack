@@ -1,7 +1,9 @@
 var express = require('express')
 var models = require('./models')
 var app = express()
+var bcrypt = require('bcrypt')
 var passport = require('passport')
+require('./config/passport/passport.js')(passport, models.user)
 //var session = require('express-session')
 //var bodyParser = require('body-parser')
 

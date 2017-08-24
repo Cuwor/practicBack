@@ -17,18 +17,17 @@
   },
   "homepage": "https://github.com/Cuwor/practicBack#readme",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "ejs": "^2.5.7",
     "ejs-locals": "^1.0.2",
     "express": "^4.15.4",
     "express-generator": "^4.15.0",
-    "mysql2": "^1.4.1",
     "node-static": "^0.7.9",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pg": "^7.1.2",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^4.5.0",
-    "sqlite3": "^3.1.9"
+    "sequelize": "^4.5.0"
   },
   "devDependencies": {
     "eslint": "^4.4.1"
