@@ -1,14 +1,17 @@
 var express = require('express')
 var models = require('./models')
 var app = express()
-var bcrypt = require('bcrypt')
+var bodyParser = require('body-parser')
 var passport = require('passport')
 require('./config/passport/passport.js')(passport, models.user)
-//var session = require('express-session')
-//var bodyParser = require('body-parser')
+var Joi = require('joi')
 
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
+app.use(bodyParser.json())
 
 app.set('view engine', 'ejs')
 app.get('/', async function(res, res) {
@@ -58,19 +61,60 @@ app.get('/page/:page', async function(req, res) {
 })
 
 app.get('/register', async function(req, res) {
-  res.render('register', {
-    title: 'Регистрация',
-    error: 'Проверьте правильность заполнения',
-    visibleError: false
-  })
+  var data = {
+    'title': 'Регистрация'
+  }
+  data.errors = []
+  res.render('register', data)
 })
 
 app.post('/register', async function(req, res) {
-  res.render('register', {
-    title: 'Регистрация',
-    error: 'Проверьте правильность заполнения',
-    visibleError: false
+
+  var schema = Joi.object().keys({
+    name: Joi.string().max(30).required(),
+    email: Joi.string().email().max(40).required(),
+    password: Joi.string().min(6).max(20).required(),
+    password2: Joi.any().valid(Joi.ref('password')).required().options({
+      language: {
+        any: {
+          allowOnly: 'Введенные пароли не совпадают'
+        }
+      }
+    })
   })
+
+  var reqData = {
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    password2: req.body.password2,
+  }
+  var result = Joi.validate(reqData, schema)
+
+  if (reqData.email) {
+    var wantedEmail = await models.User.findOne({
+      where: {
+        email: reqData.email
+      }
+    })
+  }
+
+  if (!result.error && wantedEmail == null) {
+    res.redirect('/')
+  } else {
+    var data = {
+      title: 'Регистрация'
+    }
+    data.errors = []
+    if (wantedEmail) {
+      data.errors.push({
+        message: 'Данный email уже существует'
+      })
+    }
+
+  }
+
+  res.render('register', data)
 })
 
 app.post('/auth', async function(req, res) {
