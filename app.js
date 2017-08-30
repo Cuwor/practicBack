@@ -99,7 +99,13 @@ app.post('/register', async function(req, res) {
     })
   }
 
-  if (!result.error && wantedEmail == null) {
+  if (!result.error && !wantedEmail) {
+  await  models.User.create({
+      name: reqData.name,
+      email: reqData.email,
+      password: reqData.password,
+      isAdmin: false
+    })
     res.redirect('/')
   } else {
     var data = {
@@ -111,7 +117,13 @@ app.post('/register', async function(req, res) {
         message: 'Данный email уже существует'
       })
     }
-
+    if (result.error) {
+      for (let err of result.error.details) {
+        data.errors.push({
+          'message': err.message.slice(err.message.indexOf('2" ') + 3)
+        })
+      }
+    }
   }
 
   res.render('register', data)

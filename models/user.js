@@ -27,8 +27,9 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     setterMethods: {
-      password: async function(value) {
-        var hash = await bcrypt.hash(value)
+      password: function(value) {
+        var salt = bcrypt.genSaltSync(10)
+        var hash = bcrypt.hashSync(value, salt)
         this.setDataValue('encryptedPassword', hash)
       }
     },
@@ -40,8 +41,8 @@ module.exports = function(sequelize, DataTypes) {
       }
     }
   })
-  User.prototype.comparePassword = async function(password) {
-    var result = await bcrypt.compare(password, this.encryptedPassword)
+  User.prototype.comparePassword = function(password) {
+    var result = bcrypt.compareSync(password, this.encryptedPassword)
     return result
   }
   return User
