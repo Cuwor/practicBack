@@ -1,27 +1,27 @@
 <% include layout/_header %>
-<div class="container">
-  <div class="row">
-    <h1 class="col-sm-12">Авторизация</h1>
-  </div>
-  <div class="row">
-    <div class="col-lg-4 col-sm-12">
-      <form role="form" action="/" method="post">
-          <% if(visibleError) {%>
+  <div class="container">
+    <div class="row">
+      <h1 class="col-sm-12">Авторизация</h1>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 col-sm-12">
+        <form role="form" action="" method="post">
+          <% for(let error of errors) {%>
             <div class="alert alert-danger">
-              <%= error %>
+              <%= error.message %>
             </div>
-          <% } %>
-        <div class="form-group">
-          <label for="inputEmail">Адрес email:</label>
-          <input required type="email" class="form-control input-lg" minlength="5" placeholder="Введите email">
-        </div>
-        <div class="form-group">
-          <label for="inputPassword">Пароль:</label>
-          <input required type="password" minlength="6" class="form-control input-lg" placeholder="Введите пароль">
-        </div>
-        <button type="submit" class="btn btn-success btn-lg">Войти</button>
-      </form>
+            <% } %>
+              <div class="form-group">
+                <label for="inputEmail">Адрес email:</label>
+                <input required type="email" class="form-control input-lg" minlength="5" name="email" placeholder="Введите email">
+              </div>
+              <div class="form-group">
+                <label for="inputPassword">Пароль:</label>
+                <input required type="password" minlength="6" class="form-control input-lg" name="password" placeholder="Введите пароль">
+              </div>
+              <button type="submit" class="btn btn-success btn-lg">Войти</button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
-<% include layout/_footer %>
+  <% include layout/_footer %>

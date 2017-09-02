@@ -25,17 +25,23 @@
           <li><a href="/">Не блог</a></li>
 
         </ul>
+
         <ul class="nav navbar-nav navbar-right">
-          <!-- <li id="regged" class="regged">
-            <a class="disabled">Привет чел с почтой жена@мозгов.нет</a>
-          </li> -->
-          <li id="notRegged" class="notRegged">
+          <% if ( user ){  %>
+          <li>
+            <a href="/author/<%= user.id %>" class="disabled">Привет чел</a>
+          </li>
+          <li><a href="/post/new">Новая статья</a></li>
+          <li><a href="/logout">Выйти</a></li>
+          <% }else{  %>
+          <li>
             <a href="/auth" onclick="showReg()">Вход</a>
           </li>
           <li class="notRegged">
             <a href="/register" onclick="showReg()">Регистрация</a>
           </li>
         </ul>
+         <% } %>
       </div>
     </div>
   </nav>

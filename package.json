@@ -23,6 +23,7 @@
     "ejs-locals": "^1.0.2",
     "express": "^4.15.4",
     "express-generator": "^4.15.0",
+    "express-session": "^1.15.5",
     "joi": "^10.6.0",
     "node-static": "^0.7.9",
     "passport": "^0.4.0",
