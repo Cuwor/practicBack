@@ -4,8 +4,8 @@
     <div class="row">
       <div class="col-sm-12">
       <h1><%= post.postName %></h1>
-      <span class="date"><%= post.date %>&nbsp;&nbsp;&nbsp;</span>
-      <span class="author"><a href="/author/id"><%= post.author %></a></span>
+      <span class="date"><%= post.updatedAt.toLocaleDateString({year:"numeric",month:"numeric",day:"numeric"}) %>&nbsp;&nbsp;&nbsp;</span>
+      <span class="author"><a href="/author/<%= post.user.id %>" class="label label-info"> <%= post.user.name %> </a></span>
       <hr>
       <div>
         <%= post.postText %>

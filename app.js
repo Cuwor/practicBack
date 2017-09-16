@@ -6,6 +6,7 @@ var Joi = require('joi')
 var session = require('express-session')
 var passport = require('passport')
 var LocalStrategy = require('passport-local').Strategy
+var sanitize = require('sanitize-html')
 
 
 app.use(bodyParser.urlencoded({
@@ -53,35 +54,31 @@ passport.deserializeUser(async function(id, done) {
 })
 
 app.get('/', async function(req, res) {
-  var timestamp = 1002074726404
-  var date = new Date(timestamp).toISOString().slice(0, 10)
-  var data = {
-    title: 'Все статьи',
-    posts: [{
-      id: 1,
-      postName: 'пост 1',
-      author: 'Семен',
-      date: date,
-      postText: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum... '
-    }]
-  }
+  var data = {}
+  var last_page = Math.ceil( (await models.post.count()) /10 ) || 1
   data.user = req.user
+  data.posts = await models.post.findAll({
+    limit:10,
+    order: [['updatedAt', 'DESC']],
+    include:[{model:models.user}]
+  })
+  data.page = {'title':'Главная','current':1,'last':last_page}
   res.render('index', data)
 })
 
 app.get('/page/:page', async function(req, res) {
-  var date = new Date().toISOString().slice(0, 10)
-  var data = {
-    title: 'Все статьи',
-    posts: [{
-      id: 1,
-      postName: 'пост 1',
-      author: 'Семен',
-      date: date,
-      postText: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum... '
-    }]
+  var data = {}
+  var last_page = Math.ceil( (await models.post.count()) /10 ) || 1
+  if ( req.params.page>last_page ){
+    return res.redirect('/page/'+last_page)
   }
   data.user = req.user
+  data.posts = await models.post.findAll({
+    limit:10,
+    order: [['updatedAt', 'DESC']],
+    include:[{model:models.user}]
+  })
+  data.page = {'title':'Главная','current':1,'last':last_page}
   res.render('index', data)
 })
 
@@ -95,7 +92,7 @@ app.get('/register', async function(req, res) {
   res.render('register', data)
 })
 
-app.post('/register', async function(req, res) {
+app.post('/register', async function(req, res, next) {
   if (req.isAuthenticated()) return res.redirect('/')
   var schema = Joi.object().keys({
     name: Joi.string().max(30).required(),
@@ -127,13 +124,18 @@ app.post('/register', async function(req, res) {
   }
 
   if (!result.error && !wantedEmail) {
-    await models.User.create({
+    let user = await models.User.create({
       name: reqData.name,
       email: reqData.email,
       password: reqData.password,
       isAdmin: false
     })
-    res.redirect('/')
+    req.login(user, function(err) {
+      // if server error
+      if (err) return next(err)
+      // ok -> redirect
+      return res.redirect('/')
+    })
   } else {
     var data = {
       title: 'Регистрация'
@@ -156,6 +158,29 @@ app.post('/register', async function(req, res) {
   res.render('register', data)
 })
 
+var pasAuth = function(req, res, next) {
+  passport.authenticate('local',
+    function(err, user) {
+      try {
+        req.login(user, function(err) {
+          if (err) return next(err)
+          return res.redirect('/')
+        })
+      } catch (err) {
+        console.log(err)
+        var data = {
+          title: 'Авторизация'
+        }
+        data.errors = []
+        data.errors.push({
+          message: 'Неверный логин или пароль'
+        })
+        return res.render('auth', data)
+      }
+    }
+  )(req, res, next)
+}
+
 app.post('/auth', async function(req, res, next) {
   if (req.isAuthenticated()) return res.redirect('/')
   var data = {
@@ -163,23 +188,8 @@ app.post('/auth', async function(req, res, next) {
   }
   data.user = req.user
   data.errors = []
-  return passport.authenticate('local',
-    function(err, user) {
-      if (err) return next(err)
-      if (!user) {
-        data.errors = []
-        data.errors.push({
-          message: 'Неверный логин или пароль'
-        })
-        return res.render('auth', data)
-      }
-      req.login(user, function(err) {
-        if (err) return next(err)
-        return res.redirect('/')
-      })
-    }
-  )(req, res, next)
 
+  return pasAuth(req, res, next)
 })
 
 app.get('/auth', async function(req, res) {
@@ -198,76 +208,143 @@ app.get('/post/new', async function(req, res) {
   }
   data.errors = []
   data.user = req.user
+  data.fields = {}
   res.render('new', data)
 })
 
 app.post('/post/new', async function(req, res) {
+
   if (!req.isAuthenticated()) return res.redirect('/auth')
-  var data = {
-    title: 'Новая статья'
+
+  var reqData = {
+    title: req.body.title,
+    preview: req.body.preview,
+    text: req.body.text
   }
-  data.errors = []
-  data.user = req.user
-  res.render('new', data)
+
+  var sanitizeConfig = {
+    allowedTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img', 'b', 'i', 'blockquote', 'pre', 'a'],
+    allowedAttributes: {
+      'a': ['href'],
+      'img': ['alt', 'src']
+    }
+  }
+
+  var newData = {
+    title: sanitize(reqData.title, sanitizeConfig),
+    preview: sanitize(reqData.preview, sanitizeConfig),
+    text: sanitize(reqData.text, sanitizeConfig)
+  }
+
+  try {
+    var post = await models.Post.create({
+      userId: req.user.id,
+      title: newData.title,
+      preview: newData.preview,
+      text: newData.text
+    })
+    res.redirect('/post/' + post.id)
+  } catch (err) {
+    console.log(err)
+    var data = {
+      title: 'Новая статья'
+    }
+    data.user = req.user
+    data.fields = newData
+    data.errors = [{
+      message: 'Ошибка неизвестна'
+    }]
+    res.render('new', data)
+  }
 })
 
 app.get('/post/:id', async function(req, res) {
-  var data = {
-    title: 'Статья',
-    author: 'Семен',
-    date: '15.15.2015',
-    postText: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laboru Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incid :) '
-  }
+  var data = await models.Post.findById(req.params.id, {
+    include: [models.User]
+  })
   data.user = req.user
+  data = {
+    title: data.title
+  }
   res.render('post', data)
 })
 
 app.post('/post/:id', async function(req, res) {
-  var data = {
-    title: 'Статья',
-    author: 'Семен',
-    date: '15.15.2015',
-    postText: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laboru Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incid :) '
+
+  var post = await models.post.findById(req.params.id)
+
+  var reqData = {
+    title: req.body.title,
+    preview: req.body.preview,
+    text: req.body.text
   }
-  data.user = req.user
-  res.render('post', data)
+
+  var sanitizeConfig = {
+    allowedTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img', 'b', 'i', 'blockquote', 'pre', 'a'],
+    allowedAttributes: {
+      'a': ['href'],
+      'img': ['alt', 'src']
+    }
+  }
+
+  var newData = {
+    title: sanitize(reqData.title, sanitizeConfig),
+    preview: sanitize(reqData.preview, sanitizeConfig),
+    text: sanitize(reqData.text, sanitizeConfig)
+  }
+
+  try {
+    await post.update({
+      userId: req.user.id,
+      title: newData.title,
+      preview: newData.preview,
+      text: newData.text
+    })
+    res.redirect('/post/' + post.id)
+  } catch (err) {
+    console.log(err)
+    var data = {
+      title: 'Новая статья'
+    }
+    data.user = req.user
+    data.fields = newData
+    data.errors = [{
+      message: 'Ошибка неизвестна'
+    }]
+    res.render('post', data)
+  }
 })
 
-app.put('/post/:id', async function(req, res) {
-  var data = {
-    title: 'Статья',
-    author: 'Семен',
-    date: '15.15.2015',
-    postText: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laboru Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incid :) '
-  }
-  data.user = req.user
-  res.render('post', data)
-})
 
 app.get('/post/:id/edit', async function(req, res) {
   if (!req.isAuthenticated()) return res.redirect('/auth')
+  var post = await models.Post.findById(req.params.id)
   var data = {
     title: 'Редактировать статью'
   }
   data.errors = []
   data.user = req.user
+  data.fields = {title:post.title, preview:post.preview, text:post.text}
   res.render('edit', data)
 })
 
-app.get('/author/:id', function(req, res) {
-  var data = {
-    title: 'Карточка автора',
-    author: 'Семен',
-    posts: [{
-      id: 1,
-      postName: 'пост 1'
-    },
-    {
-      id: 2,
-      postName: 'пост 2'
-    }
-    ]
+app.get('/post/:id/delete', async function(req,res){
+  if( !req.isAuthenticated() ) return res.redirect('/auth')
+
+  var post = await models.Post.findById(req.params.id)
+
+  if( req.user.id != post.userId && !req.user.isAdmin ){
+    return res.redirect('/post/'+req.params.id)
   }
+  await post.destroy()
+
+  res.redirect('/')
+})
+
+app.get('/author/:id', async function(req, res) {
+  var data = {}
+  data.pageUser = await models.User.findById( req.params.id,
+    {include:[{model:models.Post, as:'Post'}]} )
   data.user = req.user
   res.render('author', data)
 })

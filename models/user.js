@@ -32,15 +32,11 @@ module.exports = function(sequelize, DataTypes) {
         var hash = bcrypt.hashSync(value, salt)
         this.setDataValue('encryptedPassword', hash)
       }
-    },
-
-    classMethods: {
-      associate: function(models) {
-        // associations can be defined here
-        User.hasMany(models.Post)
-      }
     }
   })
+  User.associate = function(models) {
+    User.hasMany(models.Post)
+  }
   User.prototype.comparePassword = function(password) {
     var result = bcrypt.compareSync(password, this.encryptedPassword)
     return result

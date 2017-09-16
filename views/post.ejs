@@ -3,18 +3,21 @@
     <div class="row">
       <div class=" col-md-12">
         <h1><%= title %></h1>
-        <span class="date"><%= date %>&nbsp;&nbsp;&nbsp;</span>
-        <span class="author"><a href="/author/id"><%= author %></a></span>
+        <span class="date"><%= updatedAt.getDate()+' '+(updatedAt.getMonth()-0+1)+' '+updatedAt.getFullYear() %>&nbsp;&nbsp;&nbsp;</span>
+        <span class="author"><a href="/author/<%= user.id %>" class="label label-info"> <%= user.name %> </span>
         <hr>
         <%= postText %>
       </div>
     </div>
     <br>
-    <div class="row">
-      <div class="notRegged col-md-12">
-        <a href="/post/id/edit" class="btn btn-warning">Редактировать</a>
-        <button class="btn btn-danger">Удалить</button>
+    <% if( user && user.id===post.user.id || user && user.admin ){ %>
+      <div class="row">
+        <div class="notRegged col-md-12">
+          <a href="/post/<%= post.id %>/edit" class="btn btn-warning">Редактировать</a>
+          <button class="btn btn-danger">Удалить</button>
+        </div>
       </div>
-    </div>
+      <% } %>
+
   </div>
   <% include layout/_footer %>

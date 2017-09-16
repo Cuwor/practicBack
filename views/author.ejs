@@ -5,7 +5,7 @@
       <div class="col-sm-12">
         <h1><%= title %> <%= author %></h1>
         <ul class="nav nav-pills nav-stacked">
-          <% for(let post of posts){ %>
+          <% for(let post of pageUser.posts){ %>
             <li>
               <a href="/post/<%= post.id %>">
                 <%= post.postName %>

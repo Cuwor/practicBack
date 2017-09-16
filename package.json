@@ -18,21 +18,23 @@
   "homepage": "https://github.com/Cuwor/practicBack#readme",
   "dependencies": {
     "bcrypt": "^1.0.3",
-    "body-parser": "^1.17.2",
+    "body-parser": "^1.18.1",
     "ejs": "^2.5.7",
     "ejs-locals": "^1.0.2",
     "express": "^4.15.4",
     "express-generator": "^4.15.0",
     "express-session": "^1.15.5",
     "joi": "^10.6.0",
-    "node-static": "^0.7.9",
+    "node-static": "^0.7.10",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
-    "pg": "^7.2.0",
+    "pg": "^7.3.0",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^4.7.5"
+    "sanitize-html": "^1.14.1",
+    "sequelize": "^4.8.4",
+    "sequelize-cli": "^3.0.0-2"
   },
   "devDependencies": {
-    "eslint": "^4.5.0"
+    "eslint": "^4.7.0"
   }
 }
