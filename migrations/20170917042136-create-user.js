@@ -1,7 +1,7 @@
 'use strict'
 module.exports = {
   up: function(queryInterface, Sequelize) {
-    return queryInterface.createTable('Posts', {
+    return queryInterface.createTable('users', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -9,29 +9,27 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      title: {
-        allowNull: false,
-        type: Sequelize.STRING
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
-      preview: {
+      email: {
+        type: Sequelize.STRING,
         allowNull: false,
-        type: Sequelize.STRING
+        unique: true
       },
-      text: {
-        allowNull: false,
-        type: Sequelize.STRING
+      encryptedPassword: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
-      userId: {
+      isAdmin: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Users',
-          key: 'id'
-        }
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
@@ -40,6 +38,6 @@ module.exports = {
     })
   },
   down: function(queryInterface, Sequelize) {
-    return queryInterface.dropTable('Posts')
+    return queryInterface.dropTable('users')
   }
 }

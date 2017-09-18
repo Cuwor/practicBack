@@ -3,10 +3,10 @@
     <div class="row">
       <div class=" col-md-12">
         <h1><%= title %></h1>
-        <span class="date"><%= updatedAt.getDate()+' '+(updatedAt.getMonth()-0+1)+' '+updatedAt.getFullYear() %>&nbsp;&nbsp;&nbsp;</span>
-        <span class="author"><a href="/author/<%= user.id %>" class="label label-info"> <%= user.name %> </span>
+        <span class="date"><%= post.updatedAt.toLocaleDateString({year:"numeric",month:"numeric",day:"numeric"}) %>&nbsp;&nbsp;&nbsp;</span>
+        <span class="author"><a href="/author/<%= post.user.id %>" class="label label-info"> <%= post.user.name %> </a></span>
         <hr>
-        <%= postText %>
+        <%= post.text %>
       </div>
     </div>
     <br>
@@ -14,7 +14,7 @@
       <div class="row">
         <div class="notRegged col-md-12">
           <a href="/post/<%= post.id %>/edit" class="btn btn-warning">Редактировать</a>
-          <button class="btn btn-danger">Удалить</button>
+          <a href="/post/<%= post.id %>/delete" class="btn btn-danger">Удалить</a>
         </div>
       </div>
       <% } %>

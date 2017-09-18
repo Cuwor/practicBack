@@ -1,7 +1,7 @@
 'use strict'
 var bcrypt = require('bcrypt')
 module.exports = function(sequelize, DataTypes) {
-  var User = sequelize.define('User', {
+  var user = sequelize.define('user', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -34,12 +34,12 @@ module.exports = function(sequelize, DataTypes) {
       }
     }
   })
-  User.associate = function(models) {
-    User.hasMany(models.Post)
+  user.associate = function(models) {
+    user.hasMany(models.post)
   }
-  User.prototype.comparePassword = function(password) {
+  user.prototype.comparePassword = function(password) {
     var result = bcrypt.compareSync(password, this.encryptedPassword)
     return result
   }
-  return User
+  return user
 }

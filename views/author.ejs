@@ -3,12 +3,12 @@
     <div class="row">
 
       <div class="col-sm-12">
-        <h1><%= title %> <%= author %></h1>
+        <h1><%= title %></h1>
         <ul class="nav nav-pills nav-stacked">
           <% for(let post of pageUser.posts){ %>
             <li>
               <a href="/post/<%= post.id %>">
-                <%= post.postName %>
+                <%= post.title %>
               </a>
             </li>
             <% } %>

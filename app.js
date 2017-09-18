@@ -29,7 +29,7 @@ passport.use(new LocalStrategy({
   passwordField: 'password',
 },
 async function(email, password, done) {
-  let currentUser = await models.User.findOne({
+  let currentUser = await models.user.findOne({
     where: {
       email: email
     }
@@ -49,36 +49,39 @@ passport.serializeUser(async function(user, done) {
 })
 
 passport.deserializeUser(async function(id, done) {
-  let user = await models.User.findById(id)
+  let user = await models.user.findById(id)
   done(null, user)
 })
 
 app.get('/', async function(req, res) {
-  var data = {}
-  var last_page = Math.ceil( (await models.Post.count()) /10 ) || 1
+  var last_page = Math.ceil( (await models.post.count()) /10 ) || 1
+  var data = {
+    title :'Главная', current: 1, last: last_page
+  }
   data.user = req.user
-  data.posts = await models.Post.findAll({
+  data.posts = await models.post.findAll({
     limit:10,
     order: [['updatedAt', 'DESC']],
-    include:[{model:models.User}]
+    include:[{model:models.user}]
   })
-  data.page = {'title':'Главная','current':1,'last':last_page}
   res.render('index', data)
 })
 
 app.get('/page/:page', async function(req, res) {
-  var data = {}
-  var last_page = Math.ceil( (await models.Post.count()) /10 ) || 1
+  var last_page = Math.ceil( (await models.post.count()) /10 ) || 1
+  var data = {
+    title :'Главная', current: req.params.page, last: last_page
+  }
   if ( req.params.page>last_page ){
     return res.redirect('/page/'+last_page)
   }
   data.user = req.user
-  data.posts = await models.Post.findAll({
+  data.posts = await models.post.findAll({
     limit:10,
+    offset:10*(req.params.page-1),
     order: [['updatedAt', 'DESC']],
-    include:[{model:models.User}]
+    include:[{model:models.user}]
   })
-  data.page = {'title':'Главная','current':1,'last':last_page}
   res.render('index', data)
 })
 
@@ -116,7 +119,7 @@ app.post('/register', async function(req, res, next) {
   var result = Joi.validate(reqData, schema)
 
   if (reqData.email) {
-    var wantedEmail = await models.User.findOne({
+    var wantedEmail = await models.user.findOne({
       where: {
         email: reqData.email
       }
@@ -124,7 +127,7 @@ app.post('/register', async function(req, res, next) {
   }
 
   if (!result.error && !wantedEmail) {
-    let user = await models.User.create({
+    let user = await models.user.create({
       name: reqData.name,
       email: reqData.email,
       password: reqData.password,
@@ -162,6 +165,9 @@ var pasAuth = function(req, res, next) {
   passport.authenticate('local',
     function(err, user) {
       try {
+        if (!user) {
+          throw 'Неверный логин или пароль'
+        }
         req.login(user, function(err) {
           if (err) return next(err)
           return res.redirect('/')
@@ -172,6 +178,7 @@ var pasAuth = function(req, res, next) {
           title: 'Авторизация'
         }
         data.errors = []
+        data.user = req.user
         data.errors.push({
           message: 'Неверный логин или пароль'
         })
@@ -183,12 +190,6 @@ var pasAuth = function(req, res, next) {
 
 app.post('/auth', async function(req, res, next) {
   if (req.isAuthenticated()) return res.redirect('/')
-  var data = {
-    title: 'Авторизация'
-  }
-  data.user = req.user
-  data.errors = []
-
   return pasAuth(req, res, next)
 })
 
@@ -237,7 +238,7 @@ app.post('/post/new', async function(req, res) {
   }
 
   try {
-    var post = await models.Post.create({
+    var post = await models.post.create({
       userId: req.user.id,
       title: newData.title,
       preview: newData.preview,
@@ -259,19 +260,32 @@ app.post('/post/new', async function(req, res) {
 })
 
 app.get('/post/:id', async function(req, res) {
-  var data = await models.Post.findById(req.params.id, {
-    include: [models.User]
+  var data = {}
+  data.post = await models.post.findById(req.params.id, {
+    include: [models.user]
   })
   data.user = req.user
-  data = {
-    title: data.title
-  }
+  data.title = data.post.title
+
   res.render('post', data)
+})
+
+app.get('/post/:id/edit', async function(req, res) {
+  if (!req.isAuthenticated()) return res.redirect('/auth')
+  var post = await models.post.findById(req.params.id)
+  var data = {
+    title: 'Редактировать статью',
+    action:'/post/'+post.id
+  }
+  data.errors = []
+  data.user = req.user
+  data.fields = {title:post.title, preview:post.preview, text:post.text}
+  res.render('edit', data)
 })
 
 app.post('/post/:id', async function(req, res) {
 
-  var post = await models.Post.findById(req.params.id)
+  var post = await models.post.findById(req.params.id)
 
   var reqData = {
     title: req.body.title,
@@ -311,27 +325,14 @@ app.post('/post/:id', async function(req, res) {
     data.errors = [{
       message: 'Ошибка неизвестна'
     }]
-    res.render('post', data)
+    res.render('new', data)
   }
-})
-
-
-app.get('/post/:id/edit', async function(req, res) {
-  if (!req.isAuthenticated()) return res.redirect('/auth')
-  var post = await models.Post.findById(req.params.id)
-  var data = {
-    title: 'Редактировать статью'
-  }
-  data.errors = []
-  data.user = req.user
-  data.fields = {title:post.title, preview:post.preview, text:post.text}
-  res.render('edit', data)
 })
 
 app.get('/post/:id/delete', async function(req,res){
   if( !req.isAuthenticated() ) return res.redirect('/auth')
 
-  var post = await models.Post.findById(req.params.id)
+  var post = await models.post.findById(req.params.id)
 
   if( req.user.id != post.userId && !req.user.isAdmin ){
     return res.redirect('/post/'+req.params.id)
@@ -343,8 +344,9 @@ app.get('/post/:id/delete', async function(req,res){
 
 app.get('/author/:id', async function(req, res) {
   var data = {}
-  data.pageUser = await models.User.findById( req.params.id,
-    {include:[{model:models.Post, as:'Post'}]} )
+  data.pageUser = await models.user.findById( req.params.id,
+    {include:[{model:models.post, as:'posts'}]} )
+  data.title = 'Карточка пользователя ' + data.pageUser.name
   data.user = req.user
   res.render('author', data)
 })

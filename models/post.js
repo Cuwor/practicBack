@@ -1,6 +1,6 @@
 'use strict'
 module.exports = function(sequelize, DataTypes) {
-  var Post = sequelize.define('Post', {
+  var post = sequelize.define('post', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -13,18 +13,18 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     preview: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false
     },
     text: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false
     },
     userId: {
       allowNull: false,
       type: DataTypes.INTEGER,
       references: {
-        model: 'Users',
+        model: 'users',
         key: 'id'
       }
     },
@@ -37,8 +37,8 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATE
     }
   })
-  Post.associate = function(models) {
-    models.Post.belongsTo(models.User)
+  post.associate = function(models) {
+    models.post.belongsTo(models.user)
   }
-  return Post
+  return post
 }

@@ -3,12 +3,12 @@
   <% for(let post of posts){ %>
     <div class="row">
       <div class="col-sm-12">
-      <h1><%= post.postName %></h1>
+      <h1><%= post.title %></h1>
       <span class="date"><%= post.updatedAt.toLocaleDateString({year:"numeric",month:"numeric",day:"numeric"}) %>&nbsp;&nbsp;&nbsp;</span>
       <span class="author"><a href="/author/<%= post.user.id %>" class="label label-info"> <%= post.user.name %> </a></span>
       <hr>
       <div>
-        <%= post.postText %>
+        <%= post.preview %>
       </div>
       <br><a href="/post/<%= post.id %>" class="btn btn-info" role="button">Читать в источнике</a><hr>
     </div>
@@ -19,12 +19,16 @@
     <div class="row">
       <div class="col-sm-12">
         <ul class="pagination">
-          <li><a href="#">«</a></li>
-          <li><a href="#">3</a></li>
-          <li class="active"><a href="#">4</a></li>
-          <li><a href="#">5</a></li>
-          <li><a href="#">»</a></li>
-        </ul>
+        <% if(current - 1 > 0){ %>
+        <li><a href="/page/<%= current-1 %>">Previous</a></li>
+        <li><a href="/page/<%= current-1 %>"> <%= current-1 %> </a></li>
+        <% } %>
+        <li class="active"><a href="#"> <%= current %> </a></li>
+        <% if(current != last){ %>
+        <li><a href="/page/<%= current-1+2 %>"><%= current-0+1 %></a></li>
+        <li><a href="/page/<%= current-1+2 %>">Next</a></li>
+        <% } %>
+    </ul>
       </div>
     </div>
   </div>
