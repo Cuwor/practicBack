@@ -161,36 +161,37 @@ app.post('/register', async function(req, res, next) {
   res.render('register', data)
 })
 
-var pasAuth = function(req, res, next) {
-  passport.authenticate('local',
-    function(err, user) {
-      try {
-        if (!user) {
-          throw 'Неверный логин или пароль'
+function pasAuth (req, res, next) {
+  return new Promise(function (resolve, reject){
+    passport.authenticate('local',
+      function(err, user) {
+        if(err){
+          return reject(err)
+        }else {
+          req.login(user, function(err) {
+            if(err) return reject(err)
+            return resolve(user)
+          })
         }
-        req.login(user, function(err) {
-          if (err) return next(err)
-          return res.redirect('/')
-        })
-      } catch (err) {
-        console.log(err)
-        var data = {
-          title: 'Авторизация'
-        }
-        data.errors = []
-        data.user = req.user
-        data.errors.push({
-          message: 'Неверный логин или пароль'
-        })
-        return res.render('auth', data)
       }
-    }
-  )(req, res, next)
+    )(req, res, next)
+  })
 }
 
 app.post('/auth', async function(req, res, next) {
   if (req.isAuthenticated()) return res.redirect('/')
-  return pasAuth(req, res, next)
+  var data = {title: 'Авторизация'}
+  data.user = req.user
+  data.errors = []
+  try{
+    await pasAuth(req, res, next)
+    res.redirect('/')
+  } catch(err) {
+    console.log(err)
+    data.errors.push({ message : 'Неверный логин или пароль'})
+    res.render('auth', data)
+  }
+
 })
 
 app.get('/auth', async function(req, res) {
